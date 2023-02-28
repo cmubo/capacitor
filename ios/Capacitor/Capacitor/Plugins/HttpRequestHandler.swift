@@ -143,7 +143,8 @@ open class HttpRequestHandler {
     }
 
     public static func request(_ call: CAPPluginCall, _ httpMethod: String?, _ config: InstanceConfiguration?) throws {
-        guard var urlString = call.getString("url") else { throw URLError(.badURL) }
+        var allowedCharacters = CharacterSet.init("%").union(.urlQueryAllowed)
+        guard let urlString = call.getString("url") else { throw URLError(.badURL) }
         let method = httpMethod ?? call.getString("method", "GET")
 
         let headers = (call.getObject("headers") ?? [:]) as [String: Any]
@@ -151,6 +152,7 @@ open class HttpRequestHandler {
         let responseType = call.getString("responseType") ?? "text"
         let connectTimeout = call.getDouble("connectTimeout")
         let readTimeout = call.getDouble("readTimeout")
+        let dataType = call.getString("dataType") ?? "any"
 
         if urlString == urlString.removingPercentEncoding {
             guard let encodedUrlString = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)  else { throw URLError(.badURL) }
@@ -172,7 +174,7 @@ open class HttpRequestHandler {
 
         if let data = call.options["data"] as? JSValue {
             do {
-                try request.setRequestBody(data)
+                try request.setRequestBody(data, dataType)
             } catch {
                 // Explicitly reject if the http request body was not set successfully,
                 // so as to not send a known malformed request, and to provide the developer with additional context.

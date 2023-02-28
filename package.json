@@ -16,7 +16,6 @@
     "prettier": "prettier \"**/*.{css,html,java,js,mjs,ts}\"",
     "eslint": "eslint . --ext ts",
     "swiftlint": "node-swiftlint",
-    "postinstall": "lerna bootstrap",
     "version": "npm run sync-peer-dependencies"
   },
   "prettier": "@ionic/prettier-config",
